@@ -86,7 +86,7 @@ if __name__ == '__main__':
 			Handy Header Hacker (HHH)
 				by DarkRed
 			Examine HTTP response headers for common security issues
-				Ver: 1.0 - 8/19/2016
+				Ver: 1.0 - 8/23/2016
 
 
 		""",formatter_class=RawTextHelpFormatter)
