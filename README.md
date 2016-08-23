@@ -26,8 +26,8 @@ HandyHeaderHacker is a script to examine HTTP responses from a server for best s
 				Ver: 1.0 - 8/23/2016
 		
     optional arguments:
-      -h, --helpshow this help message and exit
-      -s, --securechecksInspect only headers related to HTTPS on target
+      -h, --help Show this help message and exit
+      -s, --securechecks Inspect only headers related to HTTPS on target
       -xf, --xframeoptions  Inspect only the X-Frame-Options header on target
       -xx, --xxssprotection Inspect only the X-XSS-Protection header on target
       -xc, --xcontenttypeoptions Inspect only the X-Content-Type-Options header on target
