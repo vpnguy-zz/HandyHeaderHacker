@@ -18,7 +18,7 @@ HandyHeaderHacker is a script to examine HTTP responses from a server for best s
 
 
 ## Usage ##
-    usage: hhh.py [-h] -t TARGET [-s] [-xf] [-xx] [-xc] [-g] [-c] [-a]
+    hhh.py [-h] -t TARGET [-s] [-xf] [-xx] [-xc] [-g] [-c] [-a]
 
 			Handy Header Hacker (HHH)
 				by DarkRed
