@@ -12,7 +12,7 @@ def XFrameOptions(searchheaders):
 		if "X-Frame-Options:".lower() in header.lower():
 			print "\033[1;32m[+]\033[0m Detected X-Frame-Options - '" + header.rstrip() + "' \033[1;32m(OK)\033[0m"
 			return
-	print "\033[1;31m[-]\033[0m X-Frame-Options not present \033[1;31m(Not Ok)\033[0m"		
+	print "\033[1;31m[-]\033[0m X-Frame-Options not present \033[1;31m(Not OK)\033[0m"		
 def ContentSecurityPolicy(searchheaders):
 	for header in searchheaders:
 		if "Content-Security-Policy:".lower() in header.lower():
@@ -21,19 +21,19 @@ def ContentSecurityPolicy(searchheaders):
 		if "X-Webkit-CSP:".lower() in header.lower():
 			print "\033[1;32m[+]\033[0m Detected X-Webkit-CSP - '" + header.rstrip() + "' \033[1;32m(OK)\033[0m"
 			return
-	print "\033[1;31m[-]\033[0m Content-Security-Policy not present \033[1;31m(Not Ok)\033[0m"		
+	print "\033[1;31m[-]\033[0m Content-Security-Policy not present \033[1;31m(Not OK)\033[0m"		
 def XXSSProtection(searchheaders):
 	for header in searchheaders:
 		if "X-XSS-Protection:".lower() in header.lower():
 			print "\033[1;32m[+]\033[0m Detected X-XSS-Protection - '" + header.rstrip() + "' \033[1;32m(OK)\033[0m"
 			return
-	print "\033[1;31m[-]\033[0m X-XSS-Protection not present \033[1;31m(Not Ok)\033[0m"
+	print "\033[1;31m[-]\033[0m X-XSS-Protection not present \033[1;31m(Not OK)\033[0m"
 def XContentTypeOptions(searchheaders):
 	for header in searchheaders:
 		if "X-Content-Type-Options:".lower() in header.lower():
 			print "\033[1;32m[+]\033[0m Detected X-Content-Type-Options - '" + header.rstrip() + "' \033[1;32m(OK)\033[0m"
 			return
-	print "\033[1;31m[-]\033[0m X-Content-Type-Options not present \033[1;31m(Not Ok)\033[0m"
+	print "\033[1;31m[-]\033[0m X-Content-Type-Options not present \033[1;31m(Not OK)\033[0m"
 
 def GeneralInspect(searchheaders):
 	serverversion = ""
@@ -57,21 +57,21 @@ def CookieInspection(searchheaders):
 			CookieSplit[-1] = CookieSplit[-1].rstrip()
 			CookieString = ''.join(CookieSplit)
 			if "HttpOnly".lower() not in CookieString.lower():
-				print "\033[1;31m[-]\033[0m Cookie not marked HttpOnly - '" + header.rstrip() + "' \033[1;31m(Not Ok)\033[0m"
+				print "\033[1;31m[-]\033[0m Cookie not marked HttpOnly - '" + header.rstrip() + "' \033[1;31m(Not OK)\033[0m"
 			if "Secure".lower() not in CookieString.lower():
-				print "\033[1;31m[-]\033[0m Cookie not marked Secure - '" + header.rstrip() + "' \033[1;31m(Not Ok)\033[0m"
+				print "\033[1;31m[-]\033[0m Cookie not marked Secure - '" + header.rstrip() + "' \033[1;31m(Not OK)\033[0m"
 def SecureChecks(searchheaders):
 	headerlist = ''.join(searchheaders)
 	if "Strict-Transport-Security:".lower() in headerlist.lower():
 		HSTSHeader = filter(lambda y: 'Strict-Transport-Security' in y,searchheaders)
 		print "\033[1;32m[+]\033[0m Detected Strict-Transport-Security - " + HSTSHeader[0].rstrip() + "' \033[1;32m(OK)\033[0m"
 	else:
-		print "\033[1;31m[-]\033[0m Strict-Transport-Security not present \033[1;31m(Not Ok)\033[0m"
+		print "\033[1;31m[-]\033[0m Strict-Transport-Security not present \033[1;31m(Not OK)\033[0m"
 	if "Public-Key-Pins:".lower() in headerlist.lower():
 		PKPHeader = filter(lambda y: 'Public-Key-Pins' in y,searchheaders)
 		print "\033[1;32m[+]\033[0m Detected Public-Key-Pins - " + PKPHeader[0].rstrip() + "' \033[1;32m(OK)\033[0m"
 	else:
-		print "\033[1;31m[-]\033[0m Public-Key-Pins not present \033[1;31m(Not Ok)\033[0m"
+		print "\033[1;31m[-]\033[0m Public-Key-Pins not present \033[1;31m(Not OK)\033[0m"
 
 def AnomalousHeaders(searchheaders):
 	KnownHeaders = ['HTTP/1.1','Date','Server', 'Last-Modified','ETag','Accept-Ranges','Content-Length','Vary','Cache-Control','Content-Type','Pragma','Transfer-Encoding','Connection','Set-Cookie', 'Expires', 'WWW-Authenticate', 'Content-Encoding','Age','Status', 'Content-Range','Content-Language','Public-Key-Pins','Strict-Transport-Security','ETag', 'X-Powered-By', 'X-Content-Type-Options', 'X-XSS-Protection', 'Content-Security-Policy','X-Frame-Options' ]
@@ -154,6 +154,7 @@ if __name__ == '__main__':
 		sys.exit(0)
 
 	if  "https" in args.target:
+		print "Launching Handy Header Hacker against: " + args.target
 		Headers = urllib.urlopen(args.target).headers.headers
 		XFrameOptions(Headers)
 		ContentSecurityPolicy(Headers)
@@ -166,6 +167,7 @@ if __name__ == '__main__':
 		print 'Completed at: {:%H:%M:%S on %m-%d-%Y}'.format(datetime.datetime.now())
 		sys.exit(0)
 	else:
+		print "Launching Handy Header Hacker against: " + args.target
 		Headers = urllib.urlopen(args.target).headers.headers
 		XFrameOptions(Headers)
 		ContentSecurityPolicy(Headers)
