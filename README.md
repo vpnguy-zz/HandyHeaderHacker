@@ -23,7 +23,7 @@ HandyHeaderHacker is a script to examine HTTP responses from a server for best s
 			Handy Header Hacker (HHH)
 				by DarkRed
 			Examine HTTP response headers for common security issues
-				Ver: 1.0 - 8/23/2016
+				Ver: 1.1 - 9/16/2016
 		
     optional arguments:
       -h, --help Show this help message and exit

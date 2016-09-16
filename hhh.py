@@ -4,6 +4,7 @@ import argparse
 import sys
 import urllib
 import datetime
+import ssl #For SSL context modification
 
 #Still very active in development, please no bully
 
@@ -79,6 +80,23 @@ def AnomalousHeaders(searchheaders):
 		if not any(y.lower() in header.lower() for y in KnownHeaders):
 			print "\033[1;34m[I]\033[0m Anomalous Header detected '" + header.rstrip() + "' \033[1;34m(Possible Informational)\033[0m"
 
+def RetrieveHeader(Target):
+	ReplyHeaders = ""
+	if "https" in Target[:5]:
+		sslcontext = ssl.create_default_context()
+		if args.insecure:
+			print "Ignoring certificate errors..."
+			sslcontext = ssl._create_unverified_context() #Ignore all SSL context 
+		try:
+			ReplyHeaders = urllib.urlopen(Target,context=sslcontext).headers.headers
+		except ssl.CertificateError:
+			print "SSL Certificate error, ignore with -k flag"
+			sys.exit(0)
+		return ReplyHeaders
+	else:
+		ReplyHeaders = urllib.urlopen(Target).headers.headers
+		return ReplyHeaders
+
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description="""
@@ -86,7 +104,7 @@ if __name__ == '__main__':
 			Handy Header Hacker (HHH)
 				by DarkRed
 			Examine HTTP response headers for common security issues
-				Ver: 1.0 - 8/23/2016
+				Ver: 1.1 - 9/16/2016
 
 
 		""",formatter_class=RawTextHelpFormatter)
@@ -101,80 +119,64 @@ if __name__ == '__main__':
 	parser.add_argument('-g','--general', help='Inspect general headers on target', required=False, action='store_true')
 	parser.add_argument('-c','--cookies', help='Inspect cookies on target', required=False, action='store_true')
 	parser.add_argument('-a','--headers', help='Inspect anomalous headers on target', required=False, action='store_true')
-
+	parser.add_argument('-k','--insecure', help='Ignore certificate errors on the remote host', required=False, action='store_true')
 
 
 	args = parser.parse_args()
+	multiarg = False 
 	print "Starting Handy Header Hacker... "
+
 	if args.securechecks:
-		if  "https" in args.target:
+		multiarg = True
+		if  "https" in args.target[:5]:
 			print "Attempting checks against HTTPS headers on " + args.target
-			Headers = urllib.urlopen(args.target).headers.headers
+			Headers = RetrieveHeader(args.target)
 			SecureChecks(Headers)
-			print 'Completed at: {:%H:%M:%S on %m-%d-%Y}'.format(datetime.datetime.now())
-			sys.exit(0)
 		else:
 			print "Target is not utilizing HTTPS, exiting..."
 			sys.exit(0)
 	if args.xframeoptions:
+		multiarg = True
 		print "Attempting check against X-Frame-Options header on " + args.target
-		Headers = urllib.urlopen(args.target).headers.headers
+		Headers = RetrieveHeader(args.target)
 		XFrameOptions(Headers)
-		print 'Completed at: {:%H:%M:%S on %m-%d-%Y}'.format(datetime.datetime.now())
-		sys.exit(0)
 	if args.xxssprotection:
+		multiarg = True
 		print "Attempting check against X-XSS-Protection header on " + args.target
-		Headers = urllib.urlopen(args.target).headers.headers
+		Headers = RetrieveHeader(args.target)
 		XXSSProtection(Headers)
-		print 'Completed at: {:%H:%M:%S on %m-%d-%Y}'.format(datetime.datetime.now())
-		sys.exit(0)
 	if args.xcontenttypeoptions:
+		multiarg = True
 		print "Attempting check against X-Content-Type-Options header on " + args.target
-		Headers = urllib.urlopen(args.target).headers.headers
+		Headers = RetrieveHeader(args.target)
 		XContentTypeOptions(Headers)
-		print 'Completed at: {:%H:%M:%S on %m-%d-%Y}'.format(datetime.datetime.now())
-		sys.exit(0)
 	if args.general:
+		multiarg = True
 		print "Attempting general header checks on " + args.target
-		Headers = urllib.urlopen(args.target).headers.headers
+		Headers = RetrieveHeader(args.target)
 		GeneralInspect(Headers)
-		print 'Completed at: {:%H:%M:%S on %m-%d-%Y}'.format(datetime.datetime.now())
-		sys.exit(0)
 	if args.cookies:
+		multiarg = True
 		print "Attempting cookie checks on " + args.target
-		Headers = urllib.urlopen(args.target).headers.headers
+		Headers = RetrieveHeader(args.target)
 		CookieInspection(Headers)
-		print 'Completed at: {:%H:%M:%S on %m-%d-%Y}'.format(datetime.datetime.now())
-		sys.exit(0)
 	if args.headers:
+		multiarg = True
 		print "Attempting anomalous header check on " + args.target
-		Headers = urllib.urlopen(args.target).headers.headers
+		Headers = RetrieveHeader(args.target)
 		AnomalousHeaders(Headers)
-		print 'Completed at: {:%H:%M:%S on %m-%d-%Y}'.format(datetime.datetime.now())
-		sys.exit(0)
 
-	if  "https" in args.target:
+	if multiarg == False:	#Do not run all checks if checks specified
 		print "Launching Handy Header Hacker against: " + args.target
-		Headers = urllib.urlopen(args.target).headers.headers
+		Headers = RetrieveHeader(args.target)
 		XFrameOptions(Headers)
 		ContentSecurityPolicy(Headers)
 		XXSSProtection(Headers)
 		XContentTypeOptions(Headers)
 		GeneralInspect(Headers)
 		CookieInspection(Headers)
-		SecureChecks(Headers)
+		if "https" in args.target[:5]:
+			SecureChecks(Headers)
 		AnomalousHeaders(Headers)
-		print 'Completed at: {:%H:%M:%S on %m-%d-%Y}'.format(datetime.datetime.now())
-		sys.exit(0)
-	else:
-		print "Launching Handy Header Hacker against: " + args.target
-		Headers = urllib.urlopen(args.target).headers.headers
-		XFrameOptions(Headers)
-		ContentSecurityPolicy(Headers)
-		XXSSProtection(Headers)
-		XContentTypeOptions(Headers)
-		GeneralInspect(Headers)
-		CookieInspection(Headers)
-		AnomalousHeaders(Headers)
-		print 'Completed at: {:%H:%M:%S on %m-%d-%Y}'.format(datetime.datetime.now())
-		sys.exit(0)
+	print 'Completed at: {:%H:%M:%S on %m-%d-%Y}'.format(datetime.datetime.now())
+	sys.exit(0)
