@@ -34,6 +34,8 @@ HandyHeaderHacker is a script to examine HTTP responses from a server for best s
       -g, --general Inspect general headers on target
       -c, --cookies Inspect cookies on target
       -a, --headers Inspect anomalous headers on target
+      -k, --insecure Ignore certificate errors on the remote host
+
     
     Required:
       -t TARGET, --target TARGET URL of HTTP service to inspect ex: "-t http://github.com"
