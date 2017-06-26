@@ -5,7 +5,7 @@ HandyHeaderHacker is a script to examine HTTP responses from a server for best s
 
 ## Current headers inspected
 - X-Frame-Options
-- Content-Security-Policy
+- Content-Security-Policy (Including Report-Only)
 - X-Webkit-CSP
 - X-XSS-Protection
 - X-Content-Type-Options
@@ -15,15 +15,16 @@ HandyHeaderHacker is a script to examine HTTP responses from a server for best s
 - Set-Cookie and associated cookie flags
 - Strict-Transport-Security
 - Public-Key-Pins
+- Referrer-Policy
 
 
 ## Usage ##
-    hhh.py [-h] -t TARGET [-s] [-xf] [-xx] [-xc] [-g] [-c] [-a]
+    hhh.py [-h] -t TARGET [-s] [-xf] [-xx] [-xc] [-g] [-c] [-a] [-k] [-rf]
 
 			Handy Header Hacker (HHH)
 				by DarkRed
 			Examine HTTP response headers for common security issues
-				Ver: 1.1 - 9/16/2016
+				Ver: 1.2 - 6/26/2017
 		
     optional arguments:
       -h, --help Show this help message and exit
@@ -35,6 +36,7 @@ HandyHeaderHacker is a script to examine HTTP responses from a server for best s
       -c, --cookies Inspect cookies on target
       -a, --headers Inspect anomalous headers on target
       -k, --insecure Ignore certificate errors on the remote host
+      -rf, --refpolicy Inspect only the Referrer-Policy header on target
 
     
     Required:
