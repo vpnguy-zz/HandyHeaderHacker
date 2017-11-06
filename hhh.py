@@ -108,6 +108,9 @@ def AnomalousHeaders(searchheaders):
 
 def RetrieveHeader(Target):
 	ReplyHeaders = ""
+	if "http" not in Target[:4].lower():
+		print "You must specify a protocol (\"http\" or \"https\")"
+		sys.exit(0)
 	if "https" in Target[:5]:
 		sslcontext = ssl.create_default_context()
 		if args.insecure:
