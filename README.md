@@ -24,7 +24,7 @@ HandyHeaderHacker is a script to examine HTTP responses from a server for best s
 			Handy Header Hacker (HHH)
 				by DarkRed
 			Examine HTTP response headers for common security issues
-				Ver: 1.3 - 1/11/2017
+				Ver: 1.2 - 6/26/2017
 		
     optional arguments:
       -h, --help Show this help message and exit
@@ -37,8 +37,6 @@ HandyHeaderHacker is a script to examine HTTP responses from a server for best s
       -a, --headers Inspect anomalous headers on target
       -k, --insecure Ignore certificate errors on the remote host
       -rf, --refpolicy Inspect only the Referrer-Policy header on target
-	  -b COOKIE, --cookie COOKIE Pass a cookie to your request to simulate an authenticated user, EX: ./hhh.py -t https://google.com -b "cookie1=test;cookie2=google
-
 
     
     Required:

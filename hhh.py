@@ -2,7 +2,7 @@
 from argparse import RawTextHelpFormatter
 import argparse
 import sys
-import urllib2 #Because we need cookies now
+import urllib
 import datetime
 import ssl #For SSL context modification
 
@@ -106,44 +106,22 @@ def AnomalousHeaders(searchheaders):
 		if not any(y.lower() in header.lower() for y in KnownHeaders):
 			print "\033[1;34m[I]\033[0m Anomalous Header detected '" + header.rstrip() + "' \033[1;34m(Possible Informational)\033[0m"
 
-def RetrieveHeader(Target, **cookiekey):
+def RetrieveHeader(Target):
 	ReplyHeaders = ""
-	CookieGlobal = "" #not actually global
-	if 'cookie' in cookiekey: #detect if optional cookie param is set
-		CookieGlobal =  cookiekey['cookie'] #populate function var with cookie value 
-
-	if "http" not in Target[:4].lower():
-		print "You must specify a protocol (\"http\" or \"https\")"
-		sys.exit(0)
 	if "https" in Target[:5]:
 		sslcontext = ssl.create_default_context()
 		if args.insecure:
 			print "Ignoring certificate errors..."
 			sslcontext = ssl._create_unverified_context() #Ignore all SSL context 
 		try:
-			if len(CookieGlobal) > 0:
-				print "Using provided cookie(s)..."
-				RequestFormed = urllib2.Request(Target, headers={"Cookie" : CookieGlobal}) #build request with cookies
-				ReplyHeaders = urllib2.urlopen(RequestFormed, context=sslcontext).headers.headers
-			else:
-				RequestFormed = urllib2.Request(Target)
-				ReplyHeaders = urllib2.urlopen(RequestFormed, context=sslcontext).headers.headers
+			ReplyHeaders = urllib.urlopen(Target,context=sslcontext).headers.headers
 		except ssl.CertificateError:
 			print "SSL Certificate error, ignore with -k flag"
 			sys.exit(0)
 		return ReplyHeaders
 	else:
-		if len(CookieGlobal) > 0:
-			print "Using provided cookie(s)..."
-			RequestFormed = urllib2.Request(Target,  headers={"Cookie" : CookieGlobal})
-			ReplyHeaders = urllib2.urlopen(RequestFormed).headers.headers
-		else:
-			ReplyHeaders = urllib2.urlopen(Target).headers.headers
+		ReplyHeaders = urllib.urlopen(Target).headers.headers
 		return ReplyHeaders
-		
-#Function to handle imported cookies via CLI
-def CookieList(string):
-	return string.split(';')
 
 
 if __name__ == '__main__':
@@ -152,7 +130,7 @@ if __name__ == '__main__':
 			Handy Header Hacker (HHH)
 				by DarkRed
 			Examine HTTP response headers for common security issues
-				Ver: 1.3 - 1/11/2018
+				Ver: 1.2 - 6/26/2017
 
 
 		""",formatter_class=RawTextHelpFormatter)
@@ -169,22 +147,16 @@ if __name__ == '__main__':
 	parser.add_argument('-a','--headers', help='Inspect anomalous headers on target', required=False, action='store_true')
 	parser.add_argument('-k','--insecure', help='Ignore certificate errors on the remote host', required=False, action='store_true')
 	parser.add_argument('-rf','--refpolicy', help='Inspect only the Referrer-Policy header on target', required=False, action='store_true')
-	parser.add_argument('-b','--cookie', help='Pass a cookie to your request to simulate an authenticated user, EX: ./hhh.py -t https://google.com -b "cookie1=test;cookie2=google', required=False, type=CookieList) #Sort of like cURL but with more header hacking
 
 	args = parser.parse_args()
 	multiarg = False 
 	print "Starting Handy Header Hacker... "
-	CookieGlobal = "" #Define an empty cookie variable
-	if args.cookie:
-		delim = ';'
-		CookieGlobal = delim.join(args.cookie) #Dirty hack
-	
 
 	if args.securechecks:
 		multiarg = True
 		if  "https" in args.target[:5]:
 			print "Attempting checks against HTTPS headers on " + args.target
-			Headers = RetrieveHeader(args.target, cookie=CookieGlobal)
+			Headers = RetrieveHeader(args.target)
 			SecureChecks(Headers)
 		else:
 			print "Target is not utilizing HTTPS, exiting..."
@@ -192,42 +164,42 @@ if __name__ == '__main__':
 	if args.refpolicy:
 		multiarg = True
 		print "Attempting check against Referrer-Policy header on " + args.target
-		Headers = RetrieveHeader(args.target, cookie=CookieGlobal)
+		Headers = RetrieveHeader(args.target)
 		ReferrerPolicy(Headers)
 	if args.xframeoptions:
 		multiarg = True
 		print "Attempting check against X-Frame-Options header on " + args.target
-		Headers = RetrieveHeader(args.target, cookie=CookieGlobal)
+		Headers = RetrieveHeader(args.target)
 		XFrameOptions(Headers)
 	if args.xxssprotection:
 		multiarg = True
 		print "Attempting check against X-XSS-Protection header on " + args.target
-		Headers = RetrieveHeader(args.target, cookie=CookieGlobal)
+		Headers = RetrieveHeader(args.target)
 		XXSSProtection(Headers)
 	if args.xcontenttypeoptions:
 		multiarg = True
 		print "Attempting check against X-Content-Type-Options header on " + args.target
-		Headers = RetrieveHeader(args.target, cookie=CookieGlobal)
+		Headers = RetrieveHeader(args.target)
 		XContentTypeOptions(Headers)
 	if args.general:
 		multiarg = True
 		print "Attempting general header checks on " + args.target
-		Headers = RetrieveHeader(args.target, cookie=CookieGlobal)
+		Headers = RetrieveHeader(args.target)
 		GeneralInspect(Headers)
 	if args.cookies:
 		multiarg = True
 		print "Attempting cookie checks on " + args.target
-		Headers = RetrieveHeader(args.target, cookie=CookieGlobal)
+		Headers = RetrieveHeader(args.target)
 		CookieInspection(Headers)
 	if args.headers:
 		multiarg = True
 		print "Attempting anomalous header check on " + args.target
-		Headers = RetrieveHeader(args.target, cookie=CookieGlobal)
+		Headers = RetrieveHeader(args.target)
 		AnomalousHeaders(Headers)
 
 	if multiarg == False:	#Do not run all checks if checks specified
 		print "Launching Handy Header Hacker against: " + args.target
-		Headers = RetrieveHeader(args.target, cookie=CookieGlobal)
+		Headers = RetrieveHeader(args.target)
 		XFrameOptions(Headers)
 		ContentSecurityPolicy(Headers)
 		XXSSProtection(Headers)
