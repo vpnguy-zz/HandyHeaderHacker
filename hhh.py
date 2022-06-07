@@ -90,12 +90,12 @@ def CookieInspection(searchheaders):
 def SecureChecks(searchheaders):
 	headerlist = ''.join(searchheaders)
 	if "Strict-Transport-Security:".lower() in headerlist.lower():
-		HSTSHeader = filter(lambda y: 'Strict-Transport-Security' in y,searchheaders)
+		HSTSHeader = filter(lambda y: 'Strict-Transport-Security'.lower() in y.lower(),searchheaders)
 		print "\033[1;32m[+]\033[0m Detected Strict-Transport-Security - " + HSTSHeader[0].rstrip() + "' \033[1;32m(OK)\033[0m"
 	else:
 		print "\033[1;31m[-]\033[0m Strict-Transport-Security not present \033[1;31m(Not OK)\033[0m"
 	if "Public-Key-Pins:".lower() in headerlist.lower():
-		PKPHeader = filter(lambda y: 'Public-Key-Pins' in y,searchheaders)
+		PKPHeader = filter(lambda y: 'Public-Key-Pins'.lower() in y.lower(),searchheaders)
 		print "\033[1;32m[+]\033[0m Detected Public-Key-Pins - " + PKPHeader[0].rstrip() + "' \033[1;32m(OK)\033[0m"
 	else:
 		print "\033[1;31m[-]\033[0m Public-Key-Pins not present \033[1;31m(Not OK)\033[0m"
