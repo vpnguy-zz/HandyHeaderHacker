@@ -90,12 +90,12 @@ def CookieInspection(searchheaders):
 def SecureChecks(searchheaders):
 	headerlist = ''.join(searchheaders)
 	if "Strict-Transport-Security:".lower() in headerlist.lower():
-		HSTSHeader = filter(lambda y: 'Strict-Transport-Security' in y,searchheaders)
+		HSTSHeader = filter(lambda y: 'Strict-Transport-Security'.lower() in y.lower(),searchheaders)
 		print "\033[1;32m[+]\033[0m Detected Strict-Transport-Security - " + HSTSHeader[0].rstrip() + "' \033[1;32m(OK)\033[0m"
 	else:
 		print "\033[1;31m[-]\033[0m Strict-Transport-Security not present \033[1;31m(Not OK)\033[0m"
 	if "Public-Key-Pins:".lower() in headerlist.lower():
-		PKPHeader = filter(lambda y: 'Public-Key-Pins' in y,searchheaders)
+		PKPHeader = filter(lambda y: 'Public-Key-Pins'.lower() in y.lower(),searchheaders)
 		print "\033[1;32m[+]\033[0m Detected Public-Key-Pins - " + PKPHeader[0].rstrip() + "' \033[1;32m(OK)\033[0m"
 	else:
 		print "\033[1;31m[-]\033[0m Public-Key-Pins not present \033[1;31m(Not OK)\033[0m"
@@ -121,13 +121,16 @@ def RetrieveHeader(Target, **cookiekey):
 			print "Ignoring certificate errors..."
 			sslcontext = ssl._create_unverified_context() #Ignore all SSL context 
 		try:
+			Cookies = {}
 			if len(CookieGlobal) > 0:
 				print "Using provided cookie..."
-				RequestFormed = urllib2.Request(Target, headers={"Cookie" : CookieGlobal})
-				ReplyHeaders = urllib2.urlopen(RequestFormed, context=sslcontext).headers.headers
-			else:
-				RequestFormed = urllib2.Request(Target)
-				ReplyHeaders = urllib2.urlopen(RequestFormed, context=sslcontext).headers.headers
+				Cookies = {"Cookie" : CookieGlobal}
+			
+			RequestFormed = urllib2.Request(Target, headers=Cookies)
+			ReplyHeaders = urllib2.urlopen(RequestFormed, context=sslcontext).headers.headers
+		except urllib2.HTTPError, e:
+			print "HTTP error " + str(e.code) + ", going on..."
+			ReplyHeaders = str(e.headers).split("\n")
 		except ssl.CertificateError:
 			print "SSL Certificate error, ignore with -k flag"
 			sys.exit(0)
@@ -152,6 +155,7 @@ if __name__ == '__main__':
 				by DarkRed
 			Examine HTTP response headers for common security issues
 				Ver: 1.3 - 1/11/2018
+				Ver: 1.4 - 6/08/2019
 
 
 		""",formatter_class=RawTextHelpFormatter)
